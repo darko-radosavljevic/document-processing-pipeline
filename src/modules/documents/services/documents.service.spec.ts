@@ -3,8 +3,6 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { DocumentsService } from './documents.service';
 import { Document } from '../entities/document.entity';
-import { CreateDocumentDto } from '../dto/create-document.dto';
-import { UpdateDocumentDto } from '../dto/update-document.dto';
 import { DocumentStatus, DocumentEventType } from '../enums/enums';
 
 describe('DocumentsService', () => {
@@ -46,30 +44,6 @@ describe('DocumentsService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
-  });
-
-  describe('create', () => {
-    it('should create a new document', async () => {
-      const createDocumentDto: CreateDocumentDto = {
-        filename: 'test.pdf',
-        path: '/uploads/test.pdf',
-        status: DocumentStatus.UPLOADED,
-      };
-      const expectedDocument = { id: '1', ...createDocumentDto };
-
-      mockDocumentRepository.create.mockReturnValue(expectedDocument);
-      mockDocumentRepository.save.mockResolvedValue(expectedDocument);
-
-      const result = await service.create(createDocumentDto);
-
-      expect(mockDocumentRepository.create).toHaveBeenCalledWith(
-        createDocumentDto,
-      );
-      expect(mockDocumentRepository.save).toHaveBeenCalledWith(
-        expectedDocument,
-      );
-      expect(result).toEqual(expectedDocument);
-    });
   });
 
   describe('findAll', () => {
@@ -116,29 +90,6 @@ describe('DocumentsService', () => {
       expect(mockDocumentRepository.findOne).toHaveBeenCalledWith({
         where: { id: documentId },
       });
-    });
-  });
-
-  describe('update', () => {
-    it('should update a document', async () => {
-      const documentId = '1';
-      const updateDocumentDto: UpdateDocumentDto = {
-        status: DocumentStatus.VALIDATED,
-      };
-      const existingDocument = {
-        id: documentId,
-        filename: 'test.pdf',
-        status: DocumentStatus.UPLOADED,
-      };
-      const updatedDocument = { ...existingDocument, ...updateDocumentDto };
-
-      mockDocumentRepository.findOne.mockResolvedValue(existingDocument);
-      mockDocumentRepository.save.mockResolvedValue(updatedDocument);
-
-      const result = await service.update(documentId, updateDocumentDto);
-
-      expect(mockDocumentRepository.save).toHaveBeenCalledWith(updatedDocument);
-      expect(result).toEqual(updatedDocument);
     });
   });
 
@@ -210,6 +161,29 @@ describe('DocumentsService', () => {
       await expect(service.uploadFile(mockFile)).rejects.toThrow(
         BadRequestException,
       );
+    });
+  });
+
+  describe('update', () => {
+    it('should update a document', async () => {
+      const documentId = '1';
+      const updateData = {
+        status: DocumentStatus.VALIDATED,
+      };
+      const existingDocument = {
+        id: documentId,
+        filename: 'test.pdf',
+        status: DocumentStatus.UPLOADED,
+      };
+      const updatedDocument = { ...existingDocument, ...updateData };
+
+      mockDocumentRepository.findOne.mockResolvedValue(existingDocument);
+      mockDocumentRepository.save.mockResolvedValue(updatedDocument);
+
+      const result = await service.update(documentId, updateData);
+
+      expect(mockDocumentRepository.save).toHaveBeenCalledWith(updatedDocument);
+      expect(result).toEqual(updatedDocument);
     });
   });
 

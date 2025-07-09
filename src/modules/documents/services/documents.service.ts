@@ -8,15 +8,13 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Document } from '../entities/document.entity';
-import { CreateDocumentDto } from '../dto/create-document.dto';
-import { UpdateDocumentDto } from '../dto/update-document.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { OCRResult } from '../validation-schemas/ocr-result.schema';
 import { DocumentEventType, DocumentStatus } from '../enums/enums';
 import { ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from '../../../config';
 
 /**
- * Service responsible for managing document operations including CRUD operations,
+ * Service responsible for managing document operations including read operations,
  * file uploads, and integration with document processing microservices.
  *
  * This service handles:
@@ -35,17 +33,6 @@ export class DocumentsService {
     @Inject('RABBITMQ_SERVICE')
     private readonly rabbitClient: ClientProxy,
   ) {}
-
-  /**
-   * Creates a new document record in the database
-   *
-   * @param createDocumentDto - Data transfer object containing document metadata
-   * @returns Promise<Document> - The created document entity
-   */
-  async create(createDocumentDto: CreateDocumentDto): Promise<Document> {
-    const document = this.documentRepository.create(createDocumentDto);
-    return await this.documentRepository.save(document);
-  }
 
   /**
    * Retrieves all documents from the database, ordered by creation date (newest first)
@@ -74,23 +61,6 @@ export class DocumentsService {
   }
 
   /**
-   * Updates an existing document with new metadata
-   *
-   * @param id - The unique identifier of the document to update
-   * @param updateDocumentDto - Data transfer object containing updated document metadata
-   * @returns Promise<Document> - The updated document entity
-   * @throws NotFoundException - When document with the specified ID doesn't exist
-   */
-  async update(
-    id: string,
-    updateDocumentDto: UpdateDocumentDto,
-  ): Promise<Document> {
-    const document = await this.findOne(id);
-    Object.assign(document, updateDocumentDto);
-    return await this.documentRepository.save(document);
-  }
-
-  /**
    * Permanently removes a document from the database
    *
    * @param id - The unique identifier of the document to delete
@@ -99,6 +69,22 @@ export class DocumentsService {
   async remove(id: string): Promise<void> {
     const document = await this.findOne(id);
     await this.documentRepository.remove(document);
+  }
+
+  /**
+   * Updates an existing document with new metadata (Internal use only)
+   * This method is used internally by the document processing pipeline
+   * and is not exposed via the REST API.
+   *
+   * @param id - The unique identifier of the document to update
+   * @param updateData - Object containing the fields to update
+   * @returns Promise<Document> - The updated document entity
+   * @throws NotFoundException - When document with the specified ID doesn't exist
+   */
+  async update(id: string, updateData: Partial<Document>): Promise<Document> {
+    const document = await this.findOne(id);
+    Object.assign(document, updateData);
+    return await this.documentRepository.save(document);
   }
 
   /**

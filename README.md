@@ -33,6 +33,8 @@ This application follows a modular, event-driven architecture designed for scala
 5. **Status Updates**: Document status is updated throughout the pipeline
 6. **Error Handling**: Failed documents are marked with error details
 
+**Note**: Documents are created automatically through the upload process. Manual document creation and updates are not supported as the system is designed for automated document processing workflows.
+
 ### Technology Stack
 
 | Component | Technology | Purpose |
@@ -58,7 +60,7 @@ This application follows a modular, event-driven architecture designed for scala
 - **Content Validation**: Schema-based validation of extracted content
 - **Status Tracking**: Real-time document processing status updates
 - **Error Handling**: Comprehensive error handling and logging
-- **RESTful API**: Complete CRUD operations for document management
+- **RESTful API**: Document retrieval, deletion, and upload operations
 
 ### Supported File Types
 
@@ -192,28 +194,6 @@ Returns a list of all documents with their processing status.
 GET /documents/{id}
 ```
 Returns a specific document by its UUID.
-
-**Create Document**
-```http
-POST /documents
-Content-Type: application/json
-
-{
-  "filename": "document.pdf",
-  "path": "uploads/document.pdf"
-}
-```
-
-**Update Document**
-```http
-PATCH /documents/{id}
-Content-Type: application/json
-
-{
-  "status": "validated",
-  "ocr_text": "Extracted text content"
-}
-```
 
 **Delete Document**
 ```http

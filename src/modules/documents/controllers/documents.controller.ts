@@ -2,8 +2,6 @@ import {
   Controller,
   Get,
   Post,
-  Body,
-  Patch,
   Param,
   Delete,
   HttpCode,
@@ -13,8 +11,6 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { DocumentsService } from '../services/documents.service';
-import { CreateDocumentDto } from '../dto/create-document.dto';
-import { UpdateDocumentDto } from '../dto/update-document.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
@@ -23,22 +19,11 @@ import { MAX_FILE_SIZE, UPLOAD_DESTINATION } from '../../../config';
 
 /**
  * Controller for handling document-related HTTP requests
- * Provides CRUD operations and file upload functionality for documents
+ * Provides read, delete operations and file upload functionality for documents
  */
 @Controller('documents')
 export class DocumentsController {
   constructor(private readonly documentsService: DocumentsService) {}
-
-  /**
-   * Creates a new document with the provided data
-   * @param createDocumentDto - Data transfer object containing document creation information
-   * @returns Promise resolving to the created document
-   */
-  @Post()
-  @HttpCode(HttpStatus.CREATED)
-  create(@Body() createDocumentDto: CreateDocumentDto) {
-    return this.documentsService.create(createDocumentDto);
-  }
 
   /**
    * Retrieves all documents from the system
@@ -57,20 +42,6 @@ export class DocumentsController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.documentsService.findOne(id);
-  }
-
-  /**
-   * Updates an existing document with new data
-   * @param id - The unique identifier of the document to update
-   * @param updateDocumentDto - Data transfer object containing the fields to update
-   * @returns Promise resolving to the updated document
-   */
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateDocumentDto: UpdateDocumentDto,
-  ) {
-    return this.documentsService.update(id, updateDocumentDto);
   }
 
   /**
