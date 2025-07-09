@@ -46,6 +46,7 @@ This application follows a modular, event-driven architecture designed for scala
 | **File Upload** | [Multer](https://github.com/expressjs/multer) | Multipart file handling and storage |
 | **Validation** | [Zod](https://zod.dev/) | Schema validation for OCR results |
 | **Validation** | [class-validator](https://github.com/typestack/class-validator) | DTO validation and transformation |
+| **API Documentation** | [Swagger/OpenAPI](https://swagger.io/) | Interactive API documentation and testing |
 | **Testing** | [Jest](https://jestjs.io/) | Unit and end-to-end testing framework |
 | **Language** | [TypeScript](https://www.typescriptlang.org/) | Type-safe JavaScript development |
 | **Containerization** | [Docker](https://www.docker.com/) | Application containerization and orchestration |
@@ -61,6 +62,7 @@ This application follows a modular, event-driven architecture designed for scala
 - **Status Tracking**: Real-time document processing status updates
 - **Error Handling**: Comprehensive error handling and logging
 - **RESTful API**: Document retrieval, deletion, and upload operations
+- **API Documentation**: Interactive Swagger/OpenAPI documentation for easy API exploration and testing
 
 ### Supported File Types
 
@@ -107,6 +109,7 @@ Before running this application, ensure you have the following installed:
 
 4. **Access the application**
    - **API**: http://localhost:3000
+   - **API Documentation (Swagger)**: http://localhost:3000/api
    - **RabbitMQ Management**: http://localhost:15672 (admin/admin)
    - **PostgreSQL**: localhost:15432
 
@@ -133,6 +136,8 @@ Before running this application, ensure you have the following installed:
    ```
 
 ## 🔧 Configuration
+
+
 
 ### Environment Variables
 
@@ -175,6 +180,20 @@ RABBITMQ_QUEUE=document_queue
 ```
 http://localhost:3000
 ```
+
+### API Documentation (Swagger)
+
+The application includes comprehensive API documentation powered by Swagger/OpenAPI. You can access the interactive API documentation at:
+
+```
+http://localhost:3000/api
+```
+
+The Swagger UI provides:
+- **Interactive API Explorer**: Test endpoints directly from the browser
+- **Request/Response Examples**: See expected data formats
+- **Schema Definitions**: View detailed data models
+- **Authentication**: Currently no authentication required (see security notes below)
 
 ### Authentication
 Currently, the API does not require authentication. In production, implement proper authentication mechanisms.
@@ -283,18 +302,7 @@ docker-compose -f docker-compose.dev.yml down
 docker-compose -f docker-compose.dev.yml logs -f app
 ```
 
-### Database Operations
 
-```bash
-# Access PostgreSQL
-docker-compose exec postgres psql -U postgres -d document_processing
-
-# Backup database
-docker-compose exec postgres pg_dump -U postgres document_processing > backup.sql
-
-# Restore database
-docker-compose exec -T postgres psql -U postgres document_processing < backup.sql
-```
 
 ## 🧪 Testing
 
@@ -314,20 +322,13 @@ npm run test:watch
 npm run test:e2e
 ```
 
-### Test Structure
 
-- **Unit Tests**: Located in `*.spec.ts` files alongside source code
-- **E2E Tests**: Located in `test/` directory
-- **Test Coverage**: Generated in `coverage/` directory
+
+
 
 ## 🔍 Monitoring & Logs
 
-### Health Checks
 
-All services include health checks:
-
-- **PostgreSQL**: Uses `pg_isready` to verify database connectivity
-- **RabbitMQ**: Uses `rabbitmq-diagnostics ping` to verify message broker
 
 ### Logging
 
@@ -389,12 +390,7 @@ docker system prune -a
 docker-compose up --build -d
 ```
 
-### Performance Issues
 
-1. **Increase file size limits** in environment variables
-2. **Monitor RabbitMQ queue depth** in management UI
-3. **Check database performance** with query analysis
-4. **Review application logs** for bottlenecks
 
 ## 🔒 Security Considerations
 
@@ -407,13 +403,7 @@ docker-compose up --build -d
 5. **HTTPS**: Use SSL/TLS for all communications
 6. **Database Security**: Use strong passwords and limit access
 
-### Security Best Practices
 
-- Change default passwords for all services
-- Use environment-specific configuration files
-- Implement rate limiting for API endpoints
-- Regular security updates for dependencies
-- Monitor logs for suspicious activity
 
 ## 📈 Scalability
 
@@ -426,12 +416,7 @@ The application is designed for horizontal scaling:
 3. **Message Queue**: RabbitMQ supports clustering for high availability
 4. **File Storage**: Consider cloud storage (S3, Azure Blob) for production
 
-### Performance Optimization
 
-- **Connection Pooling**: Configure database connection pools
-- **Caching**: Implement Redis for frequently accessed data
-- **CDN**: Use CDN for static file delivery
-- **Monitoring**: Implement APM tools for performance monitoring
 
 ## 🤝 Contributing
 

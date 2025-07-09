@@ -16,6 +16,7 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { MAX_FILE_SIZE, UPLOAD_DESTINATION } from '../../../config';
+import { ApiConsumes, ApiBody } from '@nestjs/swagger';
 
 /**
  * Controller for handling document-related HTTP requests
@@ -68,6 +69,19 @@ export class DocumentsController {
    * @throws BadRequestException if no file is provided in the request
    */
   @Post('upload')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+      required: ['file'],
+    },
+  })
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
